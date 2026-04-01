@@ -14,6 +14,11 @@ jobs:
   build:
     runs-on:
       - ubuntu-latest
+    env:
+      SEARCH_API_BASE: https://csl860x2oj.execute-api.us-east-2.amazonaws.com/prod
+      DOC_CATALOG_SOURCE_ID: tt-blacksmith
+      DOC_SITE_BASE_URL: https://firdovsimammedovk.github.io/tt-blacksmith
+      DOCS_SEARCH_INGEST_API_KEY: ${{ secrets.DOCS_SEARCH_INGEST_API_KEY_TT_BLACKSMITH }}
 
     steps:
     - name: Checkout
@@ -38,6 +43,16 @@ jobs:
         cd docs
         make build
         cd ..
+
+    - name: Skip indexing when API key is missing
+      if: ${{ env.DOCS_SEARCH_INGEST_API_KEY == '' }}
+      run: |
+        echo "::warning::Skipping remote search indexing because DOCS_SEARCH_INGEST_API_KEY_TT_BLACKSMITH is not set."
+
+    - name: Trigger remote search indexing
+      if: ${{ env.DOCS_SEARCH_INGEST_API_KEY != '' }}
+      run: |
+        python docs/scripts/index_remote_search.py
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
