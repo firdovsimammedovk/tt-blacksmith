@@ -20,18 +20,12 @@
     }
 
     const siteBase = new URL(siteBaseUrl);
-    const rootPath = siteBase.pathname.replace(/\/+$/, "");
-    const rootPathPrefix = rootPath ? `${rootPath}/` : "/";
 
     try {
       const input = new URL(rawUrl, siteBaseUrl);
 
       if (input.hostname === "docs.tenstorrent.com") {
-        return `${siteBase.origin}${rootPath}${input.pathname}${input.search}${input.hash}`;
-      }
-
-      if (input.hostname === siteBase.hostname && !input.pathname.startsWith(rootPathPrefix)) {
-        return `${siteBase.origin}${rootPath}${input.pathname}${input.search}${input.hash}`;
+        return `${siteBase.origin}${input.pathname}${input.search}${input.hash}`;
       }
 
       return input.toString();
