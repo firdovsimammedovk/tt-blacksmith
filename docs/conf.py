@@ -94,7 +94,7 @@ html_last_updated_fmt = "%b %d, %Y"
 
 html_baseurl = f"https://docs.tenstorrent.com/{project}"
 
-html_context = {"logo_link_url": "https://docs.tenstorrent.com/"}
+html_context = {"logo_link_url": "https://firdovsimammedovk.github.io/tenstorrent/"}
 
 
 def setup(app):
