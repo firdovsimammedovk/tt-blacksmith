@@ -6,6 +6,6 @@ from setuptools import find_packages, setup
 setup(
     name="blacksmith",
     version="0.1",
-    description="Tenstorrent Python Blacksmith",
+    description="Tenstorrent Blacksmith",
     packages=find_packages(include=["blacksmith*"]),
 )
