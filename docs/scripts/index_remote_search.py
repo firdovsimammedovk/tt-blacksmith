@@ -110,35 +110,66 @@ def main() -> int:
         print(f"Output directory not found: {output_root}", file=sys.stderr)
         return 2
 
-    docs = _build_documents(output_root, site_base, source_id)
-    if not docs:
-        print("No HTML docs found to index.", file=sys.stderr)
-        return 1
-
-    endpoint = f"{api_base}/v1/index/{source_id}"
-    print(f"Indexing {len(docs)} documents to {endpoint}")
-
-    indexed = 0
-    for batch in _chunks(docs, MAX_BATCH_SIZE):
-        payload = {"version": version, "documents": batch}
-        status, body = _post_json(endpoint, payload, api_key)
-        if status < 200 or status >= 300:
-            print(f"Indexing failed: HTTP {status}", file=sys.stderr)
-            print(body, file=sys.stderr)
-            if status == 403:
-                print(
-                    (
-                        "Hint: DOCS_SEARCH_INGEST_API_KEY must be the API key VALUE, "
-                        "not the API key ID."
-                    ),
-                    file=sys.stderr,
-                )
+    # Retry once with an allowed catalog if backend rejects the requested one.
+    requested_source = source_id
+    for attempt in range(2):
+        docs = _build_documents(output_root, site_base, source_id)
+        if not docs:
+            print("No HTML docs found to index.", file=sys.stderr)
             return 1
-        indexed += len(batch)
-        print(f"Indexed {indexed}/{len(docs)}")
 
-    print("Indexing complete.")
-    return 0
+        endpoint = f"{api_base}/v1/index/{source_id}"
+        print(f"Indexing {len(docs)} documents to {endpoint}")
+
+        indexed = 0
+        should_retry_with_fallback = False
+        for batch in _chunks(docs, MAX_BATCH_SIZE):
+            payload = {"version": version, "documents": batch}
+            status, body = _post_json(endpoint, payload, api_key)
+            if status < 200 or status >= 300:
+                print(f"Indexing failed: HTTP {status}", file=sys.stderr)
+                print(body, file=sys.stderr)
+
+                if status == 400 and attempt == 0:
+                    try:
+                        parsed = json.loads(body)
+                    except json.JSONDecodeError:
+                        parsed = {}
+                    allowed = parsed.get("allowed") if isinstance(parsed, dict) else None
+                    if parsed.get("error") == "unknown_catalog" and isinstance(allowed, list) and allowed:
+                        fallback_source = "docs-tenstorrent" if "docs-tenstorrent" in allowed else allowed[0]
+                        if fallback_source != source_id:
+                            print(
+                                (
+                                    f"Catalog '{requested_source}' is not allowed by API. "
+                                    f"Retrying with allowed catalog '{fallback_source}'."
+                                ),
+                                file=sys.stderr,
+                            )
+                            source_id = fallback_source
+                            should_retry_with_fallback = True
+                            break
+
+                if status == 403:
+                    print(
+                        (
+                            "Hint: DOCS_SEARCH_INGEST_API_KEY must be the API key VALUE, "
+                            "not the API key ID."
+                        ),
+                        file=sys.stderr,
+                    )
+                return 1
+
+            indexed += len(batch)
+            print(f"Indexed {indexed}/{len(docs)}")
+
+        if should_retry_with_fallback:
+            continue
+
+        print("Indexing complete.")
+        return 0
+
+    return 1
 
 
 if __name__ == "__main__":
