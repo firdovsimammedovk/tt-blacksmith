@@ -18,3 +18,5 @@ env/*
 !env/ffe_requirements.txt
 !env/xla_requirements.txt
 !env/requirements.txt
+
+.idea
