@@ -1,0 +1,17 @@
+experiment_name: blacksmith-mnist
+tags:
+    - tt-forge-fe
+    - model:torch
+    - lightning
+loss: forge.op.loss.CrossEntropyLoss
+dataset_id: mnist
+dtype: torch.float32
+training_config:
+    batch_size: 64
+    epochs: 2
+    lr: 0.001
+net_config:
+    input_size: 784
+    hidden_size: 512
+    output_size: 10
+    bias: True
