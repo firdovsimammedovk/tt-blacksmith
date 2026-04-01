@@ -1,7 +1,7 @@
 (() => {
   const DEFAULT_CONFIG = {
     apiBase: "https://csl860x2oj.execute-api.us-east-2.amazonaws.com/prod",
-    sourceId: "tt-blacksmith",
+    sourceId: "docs-tenstorrent",
     siteBaseUrl: "https://firdovsimammedovk.github.io/tt-blacksmith/",
   };
 

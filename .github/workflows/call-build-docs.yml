@@ -16,8 +16,9 @@ jobs:
       - ubuntu-latest
     env:
       SEARCH_API_BASE: https://csl860x2oj.execute-api.us-east-2.amazonaws.com/prod
-      DOC_CATALOG_SOURCE_ID: tt-blacksmith
+      DOC_CATALOG_SOURCE_ID: docs-tenstorrent
       DOC_SITE_BASE_URL: https://firdovsimammedovk.github.io/tt-blacksmith
+      DOCS_ID_NAMESPACE: tt-blacksmith
       DOCS_SEARCH_INGEST_API_KEY: ${{ secrets.DOCS_SEARCH_INGEST_API_KEY_TT_BLACKSMITH }}
 
     steps:

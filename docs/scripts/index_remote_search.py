@@ -45,7 +45,7 @@ def _iter_html_files(output_root: Path) -> Iterable[Path]:
         yield path
 
 
-def _build_documents(output_root: Path, site_base_url: str, catalog: str) -> list[dict]:
+def _build_documents(output_root: Path, site_base_url: str, catalog: str, version: str, id_namespace: str) -> list[dict]:
     site_base_url = site_base_url.rstrip("/")
     docs: list[dict] = []
 
@@ -54,7 +54,7 @@ def _build_documents(output_root: Path, site_base_url: str, catalog: str) -> lis
         raw = html_file.read_text(encoding="utf-8", errors="ignore")
         title = _extract_title(raw, rel)
         body = _strip_html_to_text(raw)
-        doc_id = f"{catalog}:latest:{rel}"
+        doc_id = f"{catalog}:{id_namespace}:{version}:{rel}"
         url = f"{site_base_url}/{rel}"
         docs.append({"id": doc_id, "title": title, "body": body, "url": url})
 
@@ -91,6 +91,7 @@ def main() -> int:
     output_dir = os.environ.get("DOCS_OUTPUT_DIR", "docs/output").strip()
     site_base = os.environ.get("DOC_SITE_BASE_URL", "").rstrip("/")
     version = os.environ.get("DOCS_INDEX_VERSION", "latest").strip()
+    id_namespace = os.environ.get("DOCS_ID_NAMESPACE", "tt-blacksmith").strip()
 
     if not api_base:
         print("Missing SEARCH_API_BASE", file=sys.stderr)
@@ -104,6 +105,9 @@ def main() -> int:
     if not site_base:
         print("Missing DOC_SITE_BASE_URL", file=sys.stderr)
         return 2
+    if not id_namespace:
+        print("Missing DOCS_ID_NAMESPACE", file=sys.stderr)
+        return 2
 
     output_root = Path(output_dir)
     if not output_root.exists():
@@ -113,7 +117,7 @@ def main() -> int:
     # Retry once with an allowed catalog if backend rejects the requested one.
     requested_source = source_id
     for attempt in range(2):
-        docs = _build_documents(output_root, site_base, source_id)
+        docs = _build_documents(output_root, site_base, source_id, version, id_namespace)
         if not docs:
             print("No HTML docs found to index.", file=sys.stderr)
             return 1
