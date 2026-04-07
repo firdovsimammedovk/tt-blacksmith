@@ -72,8 +72,14 @@ def get_published_versions(conf_file: Path) -> list[str]:
         return ["latest"]
 
     tags = _tags_from_git(root, pattern, max_tags)
+    # If the default v* pattern matches nothing, fall back to all tags (e.g. 1.0.0 without v prefix).
+    if not tags and pattern == "v*" and not os.environ.get("DOCS_VERSION_TAG_PATTERN"):
+        tags = _tags_from_git(root, "*", max_tags)
+
     out = ["latest"]
     for t in tags:
+        if t == "latest":
+            continue
         if t not in out:
             out.append(t)
     return out
