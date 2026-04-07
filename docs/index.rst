@@ -3,14 +3,14 @@ Welcome to TT-Blacksmith documentation!
 
 .. toctree::
    :maxdepth: 3
-   :caption: Getting Started
+   :caption: Get Started
 
    src/introduction
    src/getting-started
 
 .. toctree::
    :maxdepth: 3
-   :caption: User Guide
+   :caption: User Guides
 
    src/experiments
    src/coding-guidelines
