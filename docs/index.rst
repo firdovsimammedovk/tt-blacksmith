@@ -1,4 +1,4 @@
-Welcome to TT-Blacksmith documentation!
+Welcome to TT-Blacksmith!
 =======================================
 
 .. toctree::
