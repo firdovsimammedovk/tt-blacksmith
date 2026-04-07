@@ -3,10 +3,10 @@ Welcome to TT-Blacksmith documentation!
 
 .. toctree::
    :maxdepth: 3
-   :caption: Getting Started
+   :caption: Get Started
 
    src/introduction
-   src/getting-started
+   src/get-started
 
 .. toctree::
    :maxdepth: 3
