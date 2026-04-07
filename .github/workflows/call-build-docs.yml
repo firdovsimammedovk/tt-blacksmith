@@ -41,26 +41,21 @@ jobs:
       id: pages
       uses: actions/configure-pages@v5
 
-    - name: Build Docs
-      run: |
-        cd docs
-        make build
-        cd ..
+    # Latest at site root; each git tag under /<tag>/ (required for version switcher URLs).
+    - name: Build multi-version site
+      env:
+        DOCS_SEARCH_INGEST_API_KEY: ${{ secrets.DOCS_SEARCH_INGEST_API_KEY_TT_BLACKSMITH }}
+      run: bash docs/scripts/build_github_pages.sh
 
-    - name: Skip indexing when API key is missing
+    - name: Skip indexing note when API key is missing
       if: ${{ env.DOCS_SEARCH_INGEST_API_KEY == '' }}
       run: |
         echo "::warning::Skipping remote search indexing because DOCS_SEARCH_INGEST_API_KEY_TT_BLACKSMITH is not set."
 
-    - name: Trigger remote search indexing
-      if: ${{ env.DOCS_SEARCH_INGEST_API_KEY != '' }}
-      run: |
-        python docs/scripts/index_remote_search.py
-
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: ./docs/output
+        path: ./pages
 
   # Deployment job
   deploy:

@@ -3,6 +3,8 @@ name: On push
 on:
   push:
     branches: [ "main" ]
+    # Redeploy docs when you publish a release tag so /v1.0.0/, /v2.0.0/ exist on Pages.
+    tags: [ "v*" ]
 
 permissions:
   contents: read
@@ -13,6 +15,7 @@ permissions:
 
 jobs:
   test:
+    if: github.ref_type == 'branch'
     uses: ./.github/workflows/call-test.yml
     secrets: inherit
     with:
