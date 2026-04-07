@@ -5,16 +5,19 @@
         <span class="fa fa-caret-down"></span>
     </span>
     <div class="rst-other-versions">
-        {% if versions|length >= 1 %}
         <dl>
             <dt>{{ _('Versions') }}</dt>
             {% for version in versions %}
-            <dd><a href="https://tenstorrent.github.io/{{ project_code }}/{{ version }}/index.html">{{ version }}</a></dd>
+            <dd>
+              {% if version == 'latest' %}
+              <a href="{{ docs_site_base }}/index.html">{{ version }}</a>
+              {% else %}
+              <a href="{{ docs_site_base }}/{{ version }}/index.html">{{ version }}</a>
+              {% endif %}
+            </dd>
             {% endfor %}
         </dl>
-        {% endif %}
         <br>
-        </dl>
     </div>
 </div>
 {% endif %}

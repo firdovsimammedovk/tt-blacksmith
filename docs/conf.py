@@ -11,6 +11,7 @@
 # -- Path setup --------------------------------------------------------------
 
 import collections
+from pathlib import Path
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -20,6 +21,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("."))
+
+from docs_versions import get_published_versions
 
 SphinxConfig = collections.namedtuple("SphinxConfig", ["fullname", "shortname"])
 
@@ -94,7 +97,16 @@ html_last_updated_fmt = "%b %d, %Y"
 
 html_baseurl = f"https://docs.tenstorrent.com/{project}"
 
-html_context = {"logo_link_url": "https://firdovsimammedovk.github.io/tenstorrent/"}
+
+_docs_version = os.environ.get("DOCS_VERSION", "latest").strip()
+_docs_site_base = os.environ.get("DOC_SITE_BASE_URL", "https://firdovsimammedovk.github.io/tt-blacksmith").rstrip("/")
+
+html_context = {
+    "logo_link_url": "https://firdovsimammedovk.github.io/tenstorrent/",
+    "versions": get_published_versions(Path(__file__)),
+    "current_version": _docs_version,
+    "docs_site_base": _docs_site_base,
+}
 
 
 def setup(app):
